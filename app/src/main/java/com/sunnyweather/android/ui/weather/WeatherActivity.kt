@@ -1,14 +1,18 @@
 package com.sunnyweather.android.ui.weather
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.sunnyweather.android.R
@@ -57,10 +61,44 @@ class WeatherActivity : AppCompatActivity() {
                 Toast.makeText(this, "无法成功获取天气信息", Toast.LENGTH_SHORT).show()
                 result.exceptionOrNull()?.printStackTrace()
             }
+            swipeRefresh.isRefreshing=false//关闭进度条
         })
 
+        /*手动下拉刷新*/
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary)//改进度条颜色
+        refreshWeather()
+        /*下拉刷新监听器
+        * 当触发下拉刷新时候，调用refreshWeather()*/
+        swipeRefresh.setOnRefreshListener {
+            refreshWeather()
+        }
         /*执行刷新天气请求*/
         viewModel.refreshWeather(viewModel.locationLng,viewModel.locationLat)
+
+        /*----------------------------------------------------------------*/
+        /*第一：打开滑动菜单*/
+        navBtn.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+        /*第二：监听DrawerLayout状态，当滑动菜单隐藏也会隐藏输入法*/
+        drawerLayout.addDrawerListener(object :DrawerLayout.DrawerListener{
+            override fun onDrawerStateChanged(newState: Int) {}
+
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+
+            override fun onDrawerOpened(drawerView: View) {}
+
+            override fun onDrawerClosed(drawerView: View) {
+                val manager=getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                manager.hideSoftInputFromWindow(drawerView.windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
+            }
+        })
+    }
+
+    /*刷新天气*/
+    fun refreshWeather(){
+        viewModel.refreshWeather(viewModel.locationLng,viewModel.locationLat)
+        swipeRefresh.isRefreshing=true//让下拉刷新进度条显示出来
     }
 
     /*逻辑:从Weather对象中获取数据，然后显示到相应的控件上*/
