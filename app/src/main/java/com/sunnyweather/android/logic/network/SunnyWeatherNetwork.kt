@@ -13,15 +13,17 @@ object SunnyWeatherNetwork {
     //使用ServiceCreator创建一个PlaceService接口的动态对象
     private val placeService=ServiceCreator.create<PlaceService>()
 
+    //suspend将任意函数声明成挂起函数，挂起函数之间可以互相调用
     //定义searchPlace函数，调用PlaceService接口中定义的searchPlaces（方法，发起搜索城市数据请求
     suspend fun searchPlaces(query:String)= placeService.searchPlaces(query).await()
 
-    /*await()是一个挂起函数，给他声明一个泛型T，将await()定义成Call<T>的拓展函数，这样所有返回值是Call类型的
-    retrofit网络请求接口就都可以直接调用await函数了*/
+    /*await()是一个挂起函数，给他声明一个泛型T，将await()定义成Call<T>的拓展函数，
+    这样所有返回值是Call类型的retrofit网络请求接口就都可以直接调用await函数了*/
     private suspend fun <T> Call<T>.await():T{
 
         /*suspendCoroutine（挂起协程）必须在协程作用域或者挂起作用域才能调用，接受一个Lambda表达式，将当前协程挂起*/
         return suspendCoroutine { continuation ->
+
             /*由于拓展函数的原因，我们现在拥有Call对象的上下文。可以直接调用enqueue方法让Retrofit发起网络请求*/
             enqueue(object :Callback<T>{
                 override fun onResponse(call: Call<T>, response: Response<T>) {
@@ -43,4 +45,17 @@ object SunnyWeatherNetwork {
             })
         }
     }
+
+
+    private val weatherService=ServiceCreator.create(WeatherService::class.java)
+
+    suspend fun getDailyWeather(lng:String,lat:String)=
+        weatherService.getDailyWeather(lng,lat).await()
+
+    suspend fun getRealtimeWeather(lng:String,lat:String)=
+        weatherService.getRealtimeWeather(lng,lat).await()
+
+
+
+
 }

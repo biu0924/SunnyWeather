@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.sunnyweather.android.logic.Repository
+import com.sunnyweather.android.logic.dao.PlaceDao
 import com.sunnyweather.android.logic.model.Place
 
 class PlaceViewModel:ViewModel() {
@@ -33,4 +34,12 @@ class PlaceViewModel:ViewModel() {
     * 中，一旦searchLiveData的数据发生变化，那么观察它的switchMap就会执行，并且调用转换函数。然后转换
     * 函数调用Repository.searchPlaces(query)就可以发起网络请求。同时，switchMap方法将
     * Repository.searchPlaces(query)返回的LiveData转换成一个可观察的LiveData对象*/
+
+    /***********************************************************************************/
+    /*调用仓库层的接口*/
+    fun savePlace(place: Place)= Repository.savePlace(place)
+
+    fun getSavedPlace()= Repository.getSavedPlace()
+
+    fun isPlaceSaved()= Repository.isPlaceSaved()
 }

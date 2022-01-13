@@ -7,7 +7,7 @@ object ServiceCreator {
     private const val BASE_URL="https://api.caiyunapp.com/"
     private val retrofit=Retrofit.Builder()//baseurl和addconcerterfactory必须调用
         .baseUrl(BASE_URL)//指定所有Retrofit请求的根路径
-        .addConverterFactory(GsonConverterFactory.create())//指定Retrofit在解析数据时所使用的转换库、
+        .addConverterFactory(GsonConverterFactory.create())//指定Retrofit在解析数据时所使用的转换库
         .build()
 
     // 提供外部可见的create方法，接受class类型参数，外部调用这个方法时，
